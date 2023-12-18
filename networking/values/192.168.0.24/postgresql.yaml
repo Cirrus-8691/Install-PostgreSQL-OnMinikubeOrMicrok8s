@@ -1,0 +1,34 @@
+global:
+  storageClass: "postgresql-storage"
+auth:
+  ##
+  ## @param auth.username Name for a custom user to create
+  ##
+  username : "usr"
+  ##
+  ## @param auth.password Password for the custom user to create
+  ##
+  password : "Pwd*175"
+  ##
+  ## @param auth.database Name for a custom database to create
+  ##
+  database: "fred-24"
+
+primary:
+  service:
+    ##
+    ## @param service.type service type
+    ##
+    type: LoadBalancer
+    ## @param master.service.externalIPs Redis&reg; master service External IPs
+    ## https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
+    ##
+    # WARNING: This is not implemented 
+    # externalIPs : 
+    # - 192.168.0.24
+
+  persistence:
+    ##
+    ## @param primary.persistence.size PVC Storage Request for PostgreSql data volume
+    ##
+    size: 2Gi
