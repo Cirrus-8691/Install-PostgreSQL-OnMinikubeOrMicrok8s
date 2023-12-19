@@ -59,6 +59,7 @@ Create your own folder, in networking/values, named with the server ip, like 192
 Copy there the two files and update values for your needs:
 - postgresql.yaml where you can modify database name, user and password, persistence size.
 - pv-postgresql.yaml where you can describe persistant volume specification like hostPath and capacity storage ( same as persistence size below).
+
 Please note: pv-name and pv-hostPath are also present in install.sh for their creation and access rights.
 
 # How to install
