@@ -67,11 +67,11 @@ cd networking/postgresql
 #  - server-ip: is the ip, like 192.168.0.24, who's used by Kubernetes PostgreSql Service to share the database with external uses.
 #      127.0.0.1 is not a valid server-ip, it will be confused with PostgreSql Docker loopback localhost ip adress.
 ```
-
+Warning, if Minikube was started as super user, you have to use sudo.
 Sample:
 ```bash
 cd networking/postgresql
-./install.sh cirrus-project 192.168.0.24
+sudo ./install.sh cirrus-project 192.168.0.24
 ```
 
 # Uninstall
