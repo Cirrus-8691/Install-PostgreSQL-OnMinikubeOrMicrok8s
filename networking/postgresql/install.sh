@@ -1,12 +1,13 @@
 #!/bin/bash
 if ! [ $# -eq 2 ]; then
     echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-    echo "FATAL ERROR: No arguments supplied for project, externalIp"
+    echo "FATAL ERROR: No arguments supplied for PROJECT_NAME, EXTERNAL_IP"
     echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
     exit 1
 fi
 PROJECT_NAME=$1
 EXTERNAL_IP=$2
+
 APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
 
