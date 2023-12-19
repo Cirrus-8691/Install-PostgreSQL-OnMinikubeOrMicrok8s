@@ -1,4 +1,4 @@
-# Install PostgreSql as Docker image
+# How to install PostgreSql as Docker image
 
 <p align="center">
 <img
@@ -46,19 +46,24 @@
 
 https://github.com/bitnami/charts/tree/main/bitnami/postgresql
 
-With the standard installation, when **Minikube** restart ( when laptop or server reboot), the **StatefulSet** and **Deployment** failed to start with a message "Back-off restarting failed container", because its **Container** cannot read/write on default **StorageClass** of the previously used **PersistentVolume**.
+With the default binami installation, when **Minikube** restart ( i.e. when laptop or server restart), the **StatefulSet** postgresql failed to start with a message "Back-off restarting failed container", because its **Container** cannot read/write with the default **StorageClass** in the previously used **PersistentVolume**.
 
 # Customised install
 
-We use a **StorageClass** with **reclaimPolicy: Retain**, to keep data when the server/laptop, where Minikube is running, reboot.
+We use a **StorageClass** with **reclaimPolicy: Retain**, to keep data when the server/laptop where Minikube is running, restart.
 As Bitnami chart container run as user 1001 in goup 1001 we have to change default file acces mode of the **PersistentVolume** hostPath.
 
-See the networking/values directory who contain for each server-ip, like 192.168.0.24, a folder with two files:
+# Customise install according to projet and Minikube server ip.
+Create your own folder, in networking/values, named with the server ip, like 192.168.0.24. 
+
+Copy there the two files and update values for your needs:
 - postgresql.yaml where you can modify database name, user and password, persistence size.
 - pv-postgresql.yaml where you can describe persistant volume specification like hostPath and capacity storage ( same as persistence size below).
+Please note: pv-name and pv-hostPath are also present in install.sh for their creation and access rights.
 
 # How to install
 
+ Then run:
 ```bash
 cd networking/postgresql
 ./install.sh [projectName] [server-ip]
@@ -83,6 +88,6 @@ helm -n [projectName]-postgresql uninstall postgresql
 
 Sample:
 ```bash
-helm -n cirrus-project-postgresql uninstall postgresql
+sudo helm -n cirrus-project-postgresql uninstall postgresql
 
 ```

@@ -9,6 +9,7 @@ PROJECT_NAME=$1
 EXTERNAL_IP=$2
 APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
+
 # Check "pv-prestgresql.yaml"
 STORAGE_FOLDER="/storage"
 PV_NAME=$PACKAGE_NAME"-pv-0"
