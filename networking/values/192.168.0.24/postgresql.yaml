@@ -20,6 +20,9 @@ primary:
     ## @param service.type service type
     ##
     type: LoadBalancer
+    # ports: 
+    #  postgresql: 5432
+
     ## @param master.service.externalIPs Redis&reg; master service External IPs
     ## https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
     ##
