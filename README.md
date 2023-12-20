@@ -71,17 +71,18 @@ Create your own folder, in networking/values, named with the server ip, like 192
 Copy there the two files and update values for your needs:
 - postgresql.yaml where you can modify database name, user and password, persistence size.
 - pv-postgresql.yaml where you can describe persistant volume specification like hostPath and capacity storage ( same as persistence size below).
+
 Please note: pv-name and pv-hostPath are also present in install.sh for their creation and access rights.
 
 # How to install
 
- Then run:
+ Run:
 ```bash
 cd networking/postgresql
 ./install.sh [projectName] [server-ip]
 # where 
 #  - projectName: is the name of the project for witch PostgreSql is installed
-#  - server-ip: is the ip, like 192.168.0.24, who's used by Kubernetes PostgreSql Service to share the database with external uses.
+#  - server-ip: is the ip, like 192.168.0.24, who's used by Kubernetes PostgreSql service to share the database with external uses.
 #      127.0.0.1 is not a valid server-ip, it will be confused with PostgreSql Docker loopback localhost ip adress.
 ```
 Warning, if Minikube was started as super user, you have to use sudo.
