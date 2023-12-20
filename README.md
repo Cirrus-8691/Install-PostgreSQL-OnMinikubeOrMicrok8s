@@ -1,4 +1,16 @@
 # How to install PostgreSql as Docker image
+<p>
+  <a href="./LICENSE">
+      <img
+        alt="license:MIT"
+        src="https://img.shields.io/badge/License-MIT-blue"
+      />
+  </a>
+  <img
+      alt="Language:bash"
+      src="https://img.shields.io/badge/Language-bash-green"
+  />
+</p>
 
 <p align="center">
 <img
