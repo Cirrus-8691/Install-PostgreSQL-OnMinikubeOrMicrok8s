@@ -1,9 +1,14 @@
 #!/bin/bash
+bold=$(tput bold)
+normal=$(tput sgr0)
+underline=$(tput smul)
+red=$(tput setaf 1)
+white=$(tput setaf 7)
 if ! [ $# -eq 2 ]; then
-    echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-    echo "FATAL ERROR: No arguments supplied for PROJECT_NAME, EXTERNAL_IP"
-    echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-    exit 1
+  echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}PROJECT_NAME, EXTERNAL_IP${normal}"
+  echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
+  exit 1
 fi
 PROJECT_NAME=$1
 EXTERNAL_IP=$2

@@ -1,9 +1,14 @@
 #!/bin/bash
+bold=$(tput bold)
+normal=$(tput sgr0)
+underline=$(tput smul)
+red=$(tput setaf 1)
+white=$(tput setaf 7)
 if ! [ $# -eq 2 ]; then
-    echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-    echo "FATAL ERROR: No arguments supplied for NAMESPACE, EXTERNAL_IP"
-    echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-    exit 1
+  echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}NAMESPACE, EXTERNAL_IP${normal}"
+  echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
+  exit 1
 fi
 PACKAGE_NAME="postgresql"
 NAMESPACE=$1
@@ -14,7 +19,6 @@ echo "┃ 🔵  Patch $PACKAGE_NAME service"
 echo "┃────────────────────────────────────────────"
 echo "┃ 🔷  Parameters"
 echo "┃────────────────────────────────────────────"
-
 echo "┃ 🔹 package    = "$PACKAGE_NAME
 echo "┃ 🔹 namespace  = "$NAMESPACE
 echo "┃ 🔹 externalIp = "$EXTERNAL_IP
