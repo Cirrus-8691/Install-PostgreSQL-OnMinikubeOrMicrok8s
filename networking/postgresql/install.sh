@@ -15,6 +15,7 @@ EXTERNAL_IP=$2
 
 APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
+NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
 
 # Check "pv-prestgresql.yaml"
 STORAGE_FOLDER="/storage"
@@ -26,7 +27,6 @@ echo "┃ 🔵  Install $APP_INSTALLED for project $PROJECT_NAME"
 echo "┃────────────────────────────────────────────"
 echo "┃ 🔷  Parameters"
 echo "┃────────────────────────────────────────────"
-NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
 echo "┃ 🔹 package    = "$PACKAGE_NAME
 echo "┃ 🔹 namespace  = "$NAMESPACE
 echo "┃ 🔹 externalIp = "$EXTERNAL_IP
@@ -38,7 +38,7 @@ NAMESPACE_FOUND=$(kubectl get namespace | grep $NAMESPACE)
 if [[ "$NAMESPACE_FOUND" == *"$NAMESPACE"* ]]; then
 
     echo "┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "┃ 🟢  $APP_INSTALLED already installed"
+    echo "┃ 🟢  $APP_INSTALLED already installed for project $PROJECT_NAME"
     echo "┃────────────────────────────────────────────"
     echo "┃ 🟢 You do not have to restore data"
     echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -54,18 +54,18 @@ else
         echo "✨  Install StorageClass"
         kubectl apply -f storageclass.yaml
         if ! [ $? -eq 0 ]; then
-            echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-            echo "🔥FATAL ERROR: 🔴  INSTALL $APP_INSTALLED: storageclass"
-            echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}StorageClass${normal}"
+            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
             exit 1
         fi
 
         echo "✨  Install PersistentVolume"
         kubectl apply -f ../values/$EXTERNAL_IP/pv-$PACKAGE_NAME.yaml
         if ! [ $? -eq 0 ]; then
-            echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-            echo "🔥FATAL ERROR: 🔴  INSTALL $APP_INSTALLED: PersistentVolume"
-            echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
+            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
             exit 1
         fi
         echo "✨  Creating "$STORAGE_FOLDER
@@ -79,9 +79,9 @@ else
         echo "♻️  Recycle existing PersistentVolume"
         kubectl patch pv $PV_NAME -p '{"spec":{"claimRef": null}}'
         if ! [ $? -eq 0 ]; then
-            echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-            echo "🔥FATAL ERROR: 🔴  RECYCLE $APP_INSTALLED: PersistentVolume"
-            echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "┃${white} 🔥FATAL ERROR: Recycle $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
+            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
             exit 1
         fi
     fi
@@ -89,26 +89,19 @@ else
     echo "✨  Create Namespace "$NAMESPACE
     kubectl create ns $NAMESPACE
     if ! [ $? -eq 0 ]; then
-        echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-        echo "🔥FATAL ERROR: 🔴  INSTALL $APP_INSTALLED: Namespace"
-        echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+        echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}Namespace${normal} "
+        echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
         exit 1
     fi
 
     echo "✨  Install $APP_INSTALLED"
     helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$EXTERNAL_IP/$PACKAGE_NAME.yaml
     if ! [ $? -eq 0 ]; then
-        echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-        echo "🔥FATAL ERROR: 🔴  INSTALL $APP_INSTALLED: "$PACKAGE_NAME
-        echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
+        echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}$PACKAGE_NAME${normal} "
+        echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
         exit 1
-    fi
-    ./patch-externalIP.sh $NAMESPACE $EXTERNAL_IP
-    if ! [ $? -eq 0 ]; then
-        echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-        echo "🔥FATAL ERROR: 🔴  INSTALL  $APP_INSTALLED: patch service externalIP"
-        echo "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥"
-    exit 1
     fi
 fi
 
