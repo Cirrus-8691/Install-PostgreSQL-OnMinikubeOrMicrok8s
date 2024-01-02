@@ -76,7 +76,12 @@ Please note: pv-name and pv-hostPath are also present in install.sh for their cr
 
 # How to install
 
- Run:
+```bash
+#Add bitnami repo only once
+sudo helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+
+ Then run:
 ```bash
 cd networking/postgresql
 ./install.sh [projectName] [server-ip]
