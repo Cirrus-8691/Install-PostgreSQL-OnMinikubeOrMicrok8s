@@ -34,7 +34,7 @@ echo "┃───────────────────────�
 echo "┃ 🔹 PersistentVolume name = "$PV_NAME
 echo "┃ 🔹 PersistentVolume path = "$PV_PATH
 
-NAMESPACE_FOUND=$(kubectl get namespace | grep $NAMESPACE)
+NAMESPACE_FOUND=$(microk8s kubectl get namespace | grep $NAMESPACE)
 if [[ "$NAMESPACE_FOUND" == *"$NAMESPACE"* ]]; then
 
     echo "┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -46,13 +46,12 @@ if [[ "$NAMESPACE_FOUND" == *"$NAMESPACE"* ]]; then
 else
     echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-    
     echo "🛂  Check PersistentVolume $PV_NAME"
-    kubectl get pv $PV_NAME
+    microk8s kubectl get pv $PV_NAME
     if ! [ $? -eq 0 ]; then
 
         echo "✨  Install StorageClass"
-        kubectl apply -f storageclass.yaml
+        microk8s kubectl apply -f ./storageclass.yaml
         if ! [ $? -eq 0 ]; then
             echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}StorageClass${normal}"
@@ -61,7 +60,7 @@ else
         fi
 
         echo "✨  Install PersistentVolume"
-        kubectl apply -f ../values/$EXTERNAL_IP/pv-$PACKAGE_NAME.yaml
+        microk8s kubectl apply -f ../values/$EXTERNAL_IP/pv-$PACKAGE_NAME.yaml
         if ! [ $? -eq 0 ]; then
             echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
@@ -77,7 +76,7 @@ else
 
     else
         echo "♻️  Recycle existing PersistentVolume"
-        kubectl patch pv $PV_NAME -p '{"spec":{"claimRef": null}}'
+        microk8s kubectl patch pv $PV_NAME -p '{"spec":{"claimRef": null}}'
         if ! [ $? -eq 0 ]; then
             echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "┃${white} 🔥FATAL ERROR: Recycle $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
@@ -87,7 +86,7 @@ else
     fi
 
     echo "✨  Create Namespace "$NAMESPACE
-    kubectl create ns $NAMESPACE
+    microk8s kubectl create ns $NAMESPACE
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}Namespace${normal} "
@@ -96,7 +95,7 @@ else
     fi
 
     echo "✨  Install $APP_INSTALLED"
-    helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$EXTERNAL_IP/$PACKAGE_NAME.yaml
+    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$EXTERNAL_IP/$PACKAGE_NAME.yaml
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}$PACKAGE_NAME${normal} "

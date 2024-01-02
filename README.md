@@ -1,4 +1,4 @@
-# How to install PostgreSql as Docker image
+# How to install PostgreSql as Docker image 
 <p>
   <a href="./LICENSE">
       <img
@@ -26,7 +26,7 @@
 </p>
 
 
-# In Minikube Kubernetes
+# In Minikube or Microk8s
 
 <p align="center">
 <img
@@ -81,9 +81,10 @@ Please note: pv-name and pv-hostPath are also present in install.sh for their cr
 sudo helm repo add bitnami https://charts.bitnami.com/bitnami
 ```
 
- Then run:
+ ## Minikube
+ For install run:
 ```bash
-cd networking/postgresql
+cd networking/postgresql-minikube
 ./install.sh [projectName] [server-ip]
 # where 
 #  - projectName: is the name of the project for witch PostgreSql is installed
@@ -97,15 +98,21 @@ cd networking/postgresql
 sudo ./install.sh cirrus-project 192.168.0.24
 ```
 
-# Uninstall
+Uninstall
 ```bash
 helm -n [projectName]-postgresql uninstall postgresql
 # where 
 #  - projectName: is the name of the project for witch PostgreSql is installed
 ```
 
-Sample:
+## Microk8s:
+For install run:
 ```bash
-sudo helm -n cirrus-project-postgresql uninstall postgresql
-
+cd networking/postgresql-microk8s
+./install.sh [projectName] [server-ip]
 ```
+Uninstall
+```bash
+microk8s helm -n [projectName]-postgresql uninstall postgresql
+```
+
