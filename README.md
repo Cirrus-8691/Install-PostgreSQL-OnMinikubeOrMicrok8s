@@ -109,10 +109,10 @@ helm -n [projectName]-postgresql uninstall postgresql
 For install run:
 ```bash
 cd networking/postgresql-microk8s
-./install.sh [projectName] [server-ip]
+sudo ./install.sh [projectName] [server-ip]
 ```
 Uninstall
 ```bash
-microk8s helm -n [projectName]-postgresql uninstall postgresql
+sudo microk8s helm -n [projectName]-postgresql uninstall postgresql
 ```
 
