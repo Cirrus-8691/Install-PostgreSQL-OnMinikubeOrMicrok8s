@@ -26,7 +26,7 @@
 </p>
 
 
-# In Minikube or Microk8s
+# In Minikube or Microk8s environment
 
 <p align="center">
 <img
