@@ -40,6 +40,7 @@
     height="128"
 />
 </p>
+In a single MicroK8s node.
 
 # Using bitnami/postgresql helm chart
 
