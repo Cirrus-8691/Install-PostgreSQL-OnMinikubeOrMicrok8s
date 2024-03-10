@@ -20,6 +20,14 @@ PACKAGE_NAME="postgresql"
 NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
 
 # Warning: no PV with storageClass: "nfs-csi" 
+# ----------------------------------------------
+# CHECK /srv/nfs path expecting:
+#   chown -R 1001:1001 $PV_PATH
+#   chmod -R a+rwx $PV_PATH
+# ----------------------------------------------
+# root@microk8s-1:/srv# ls -la
+#  drwxrwxrwx  3 1001 microk8s ... nfs
+# ----------------------------------------------
 
 echo ""
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -62,12 +70,13 @@ else
     fi
 
     ./patch-externalIP.sh $NAMESPACE $MICROK8S_SERVER_IP
-        if ! [ $? -eq 0 ]; then
+    if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}patch-externalIP${normal} "
         echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
         exit 1
     fi
+
 fi
 
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
