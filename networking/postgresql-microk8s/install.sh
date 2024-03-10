@@ -6,12 +6,14 @@ red=$(tput setaf 1)
 white=$(tput setaf 7)
 if ! [ $# -eq 2 ]; then
   echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}PROJECT_NAME, EXTERNAL_IP${normal}"
+  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}PROJECT_NAME${normal}"
   echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
   exit 1
 fi
 PROJECT_NAME=$1
-EXTERNAL_IP=$2
+INFOS=$(ip a | grep 'inet ' | grep /24)
+IFS=' /' read -r -a INFO_ITEMS <<< "$INFOS"
+MICROK8S_SERVER_IP=${INFO_ITEMS[1]}
 
 APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
@@ -29,7 +31,7 @@ echo "┃ 🔷  Parameters"
 echo "┃────────────────────────────────────────────"
 echo "┃ 🔹 package    = "$PACKAGE_NAME
 echo "┃ 🔹 namespace  = "$NAMESPACE
-echo "┃ 🔹 externalIp = "$EXTERNAL_IP
+echo "┃ 🔹 externalIp = "$MICROK8S_SERVER_IP
 echo "┃────────────────────────────────────────────"
 echo "┃ 🔹 PersistentVolume name = "$PV_NAME
 echo "┃ 🔹 PersistentVolume path = "$PV_PATH
@@ -50,39 +52,15 @@ else
     microk8s kubectl get pv $PV_NAME
     if ! [ $? -eq 0 ]; then
 
-        echo "✨  Install StorageClass"
-        microk8s kubectl apply -f ./storageclass.yaml
-        if ! [ $? -eq 0 ]; then
-            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}StorageClass${normal}"
-            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
-            exit 1
-        fi
-
         echo "✨  Install PersistentVolume"
-        microk8s kubectl apply -f ../values/$EXTERNAL_IP/pv-$PACKAGE_NAME.yaml
+        microk8s kubectl apply -f ../values/$MICROK8S_SERVER_IP/pv-$PACKAGE_NAME.yaml
         if ! [ $? -eq 0 ]; then
             echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
             echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
             exit 1
         fi
-        echo "✨  Creating "$STORAGE_FOLDER
-        mkdir $STORAGE_FOLDER
-        echo "✨  Creating "$PV_PATH
-        mkdir $PV_PATH
-        chown -R 1001:1001 $PV_PATH
-        chmod -R a+rwx $PV_PATH
 
-    else
-        echo "♻️  Recycle existing PersistentVolume"
-        microk8s kubectl patch pv $PV_NAME -p '{"spec":{"claimRef": null}}'
-        if ! [ $? -eq 0 ]; then
-            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "┃${white} 🔥FATAL ERROR: Recycle $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
-            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
-            exit 1
-        fi
     fi
 
     echo "✨  Create Namespace "$NAMESPACE
@@ -95,7 +73,7 @@ else
     fi
 
     echo "✨  Install $APP_INSTALLED"
-    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$EXTERNAL_IP/$PACKAGE_NAME.yaml
+    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/$PACKAGE_NAME.yaml
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}$PACKAGE_NAME${normal} "
@@ -103,7 +81,7 @@ else
         exit 1
     fi
 
-    ./patch-externalIP.sh $NAMESPACE $EXTERNAL_IP
+    ./patch-externalIP.sh $NAMESPACE $MICROK8S_SERVER_IP
         if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}patch-externalIP${normal} "
