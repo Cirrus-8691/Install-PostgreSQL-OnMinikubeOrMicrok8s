@@ -3,7 +3,7 @@
 ## Using NFS storage
 ############################################
 global:
-  storageClass: "postgresql-storage"
+  storageClass: "nfs-csi"
 auth:
   ##
   ## @param auth.username Name for a custom user to create
