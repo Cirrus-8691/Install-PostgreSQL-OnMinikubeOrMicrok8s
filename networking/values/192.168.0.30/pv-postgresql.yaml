@@ -1,5 +1,6 @@
 ############################################
-##
+## Minikube
+############################################
 ##  capacity storage: 100Mi
 ##  /storage/data-postgresql-pv-0 must be created before
 ##

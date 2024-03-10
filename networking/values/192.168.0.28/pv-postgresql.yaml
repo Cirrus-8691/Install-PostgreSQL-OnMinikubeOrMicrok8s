@@ -1,6 +1,8 @@
 ############################################
+## Minikube
+############################################
 ##
-##  capacity storage: 2Gi
+##  capacity storage: 100Mi
 ##  /storage/data-postgresql-pv-0 must be created before
 ##
 ############################################
@@ -11,7 +13,7 @@ metadata:
 spec:
   storageClassName: postgresql-storage
   capacity:
-    storage: 2Gi
+    storage: 100Mi
   accessModes:
   - ReadWriteOnce
   hostPath:
