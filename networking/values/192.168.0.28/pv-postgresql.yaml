@@ -9,6 +9,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
+  # Check install.sh for the "name"
   name: postgresql-pv-0
 spec:
   storageClassName: postgresql-storage

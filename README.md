@@ -61,6 +61,8 @@ https://github.com/bitnami/charts/tree/main/bitnami/postgresql
 
 With the default binami installation, when **Minikube** restart ( i.e. when laptop or server restart), the **StatefulSet** postgresql failed to start with a message "Back-off restarting failed container", because its **Container** cannot read/write with the default **StorageClass** in the previously used **PersistentVolume**.
 
+## Minikube
+
 # Customised install
 
 We use a **StorageClass** with **reclaimPolicy: Retain**, to keep data when the server/laptop where Minikube is running, restart.
@@ -74,15 +76,13 @@ Copy there the two files and update values for your needs:
 - pv-postgresql.yaml where you can describe persistant volume specification like hostPath and capacity storage ( same as persistence size below).
 
 Please note: pv-name and pv-hostPath are also present in install.sh for their creation and access rights.
-
-# How to install
+ 
 
 ```bash
 #Add bitnami repo only once
 sudo helm repo add bitnami https://charts.bitnami.com/bitnami
 ```
 
- ## Minikube
  For install run:
 ```bash
 cd networking/postgresql-minikube
@@ -107,6 +107,11 @@ helm -n [projectName]-postgresql uninstall postgresql
 ```
 
 ## Microk8s:
+```bash
+#Add bitnami repo only once
+sudo microk8s helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+
 - After openning a SSH session to one of the server of the Mick8s cluster,
 - git clonet his project,
 - create a folder named using the current server ip, like "192.168.0.45",
@@ -115,7 +120,7 @@ helm -n [projectName]-postgresql uninstall postgresql
   
 ```bash
 cd networking/postgresql-microk8s
-sudo ./install.sh [projectName]
+sudo ./install-nfs.sh [projectName]
 ```
 Uninstall
 ```bash

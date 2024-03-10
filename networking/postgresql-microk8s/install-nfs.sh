@@ -19,10 +19,8 @@ APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
 NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
 
-# Check "pv-prestgresql.yaml"
-STORAGE_FOLDER="/storage"
-PV_NAME=$PACKAGE_NAME"-pv-0"
-PV_PATH=$STORAGE_FOLDER"/data-"$PV_NAME
+# Warning: no PV with storageClass: "nfs-csi" 
+
 echo ""
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "┃ 🔵  Install $APP_INSTALLED for project $PROJECT_NAME"
@@ -32,9 +30,6 @@ echo "┃───────────────────────�
 echo "┃ 🔹 package    = "$PACKAGE_NAME
 echo "┃ 🔹 namespace  = "$NAMESPACE
 echo "┃ 🔹 externalIp = "$MICROK8S_SERVER_IP
-echo "┃────────────────────────────────────────────"
-echo "┃ 🔹 PersistentVolume name = "$PV_NAME
-echo "┃ 🔹 PersistentVolume path = "$PV_PATH
 
 NAMESPACE_FOUND=$(microk8s kubectl get namespace | grep $NAMESPACE)
 if [[ "$NAMESPACE_FOUND" == *"$NAMESPACE"* ]]; then
@@ -47,21 +42,6 @@ if [[ "$NAMESPACE_FOUND" == *"$NAMESPACE"* ]]; then
 
 else
     echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-    echo "🛂  Check PersistentVolume $PV_NAME"
-    microk8s kubectl get pv $PV_NAME
-    if ! [ $? -eq 0 ]; then
-
-        echo "✨  Install PersistentVolume"
-        microk8s kubectl apply -f ../values/$MICROK8S_SERVER_IP/pv-$PACKAGE_NAME.yaml
-        if ! [ $? -eq 0 ]; then
-            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
-            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
-            exit 1
-        fi
-
-    fi
 
     echo "✨  Create Namespace "$NAMESPACE
     microk8s kubectl create ns $NAMESPACE

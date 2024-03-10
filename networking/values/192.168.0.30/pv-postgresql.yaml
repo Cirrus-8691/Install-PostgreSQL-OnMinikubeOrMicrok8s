@@ -10,6 +10,7 @@ kind: PersistentVolume
 metadata:
   name: postgresql-pv-0
 spec:
+  # Check install.sh for the "name"
   storageClassName: postgresql-storage
   capacity:
     storage: 100Mi
