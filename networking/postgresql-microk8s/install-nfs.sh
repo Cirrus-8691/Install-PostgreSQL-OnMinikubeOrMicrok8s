@@ -20,14 +20,6 @@ PACKAGE_NAME="postgresql"
 NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
 
 # Warning: no PV with storageClass: "nfs-csi" 
-# ----------------------------------------------
-# CHECK /srv/nfs path expecting:
-#   chown -R 1001:1001 $PV_PATH
-#   chmod -R a+rwx $PV_PATH
-# ----------------------------------------------
-# root@microk8s-1:/srv# ls -la
-#  drwxrwxrwx  3 1001 microk8s ... nfs
-# ----------------------------------------------
 
 echo ""
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -76,6 +68,25 @@ else
         echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
         exit 1
     fi
+
+    # ----------------------------------------------
+    # CHECK /srv/nfs path expecting:
+    #   chown -R 1001:1001 $PV_PATH
+    #   chmod -R a+rwx $PV_PATH
+    # ----------------------------------------------
+    INFOS=$(microk8s kubectl get pvc -n $NAMESPACE | grep nfs-csi)
+    IFS=' ' read -r -a INFO_ITEMS <<< "$INFOS"
+    VOLUME=${INFO_ITEMS[2]}
+    PV=$(microk8s kubectl get pv $VOLUME)
+    volumeHandle=$(microk8s kubectl get pv $VOLUME -o jsonpath="{.spec.csi.volumeHandle}")
+
+    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "┃  Check NFS path: "$volumeHandle
+    echo "┃  Expecting: ls -la => drwxrwxrwx 3 1001 1001"
+    echo "┃  If not:"
+    echo "┃  chown -R 1001:1001 [PATH]"
+    echo "┃  chmod -R a+rwx [PATH]"
+    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 fi
 
