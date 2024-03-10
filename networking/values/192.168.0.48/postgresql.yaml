@@ -1,0 +1,41 @@
+############################################
+## Microk8s
+## Using NFS storage
+############################################
+global:
+  storageClass: "postgresql-storage"
+auth:
+  ##
+  ## @param auth.username Name for a custom user to create
+  ##
+  username : "holiday-notebook"
+  ##
+  ## @param auth.password Password for the custom user to create
+  ##
+  password : "Fred*123"
+  ##
+  ## @param auth.database Name for a custom database to create
+  ##
+  database: "dev-on-vm"
+
+primary:
+  service:
+    ##
+    ## @param service.type service type
+    ##
+    type: LoadBalancer
+    # ports: 
+    #  postgresql: 5432
+
+    ## @param master.service.externalIPs Redis&reg; master service External IPs
+    ## https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
+    ##
+    # WARNING: This is not implemented 
+    # externalIPs : 
+    # - 192.168.0.48
+
+  persistence:
+    ##
+    ## @param primary.persistence.size PVC Storage Request for PostgreSql data volume
+    ##
+    size: 2Gi
