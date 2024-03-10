@@ -4,7 +4,7 @@ normal=$(tput sgr0)
 underline=$(tput smul)
 red=$(tput setaf 1)
 white=$(tput setaf 7)
-if ! [ $# -eq 2 ]; then
+if ! [ $# -eq 1 ]; then
   echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}PROJECT_NAME${normal}"
   echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
