@@ -110,6 +110,7 @@ helm -n [projectName]-postgresql uninstall postgresql
 - After openning a SSH session to one of the server of the Mick8s cluster,
 - git clonet his project,
 - create a folder named using the current server ip, like "192.168.0.45",
+- customise install according to projet ( capacity storage, ...)
 - install Postgresql with:
   
 ```bash
