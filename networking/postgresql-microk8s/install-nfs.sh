@@ -72,6 +72,7 @@ else
     # ----------------------------------------------
     # CHECK /srv/nfs path expecting:
     #   chown -R 1001:1001 $PV_PATH
+    # Et surout:
     #   chmod -R a+rwx $PV_PATH
     # ----------------------------------------------
     INFOS=$(microk8s kubectl get pvc -n $NAMESPACE | grep nfs-csi)
