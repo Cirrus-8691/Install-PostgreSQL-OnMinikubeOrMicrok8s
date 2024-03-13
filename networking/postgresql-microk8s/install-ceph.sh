@@ -19,7 +19,7 @@ APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
 NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
 
-# Warning: no PV with storageClass: "nfs-csi" 
+# Warning: no PV with storageClass: "ceph-rbd" 
 
 echo ""
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -51,22 +51,6 @@ else
         echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
         exit 1
     fi
-
-    # echo "✨  Install PersistentVolume"
-    # microk8s kubectl apply -f ../values/$MICROK8S_SERVER_IP/ceph-pv-$PACKAGE_NAME.yaml
-    # if ! [ $? -eq 0 ]; then
-    #     echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    #     echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
-    #     echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
-    #     exit 1
-    # fi
-
-    # echo "✨  Creating "$STORAGE_FOLDER
-    # mkdir $STORAGE_FOLDER
-    # echo "✨  Creating "$PV_PATH
-    # mkdir $PV_PATH
-    # chown -R 1001:1001 $PV_PATH
-    # chmod -R a+rwx $PV_PATH
 
     echo "✨  Install $APP_INSTALLED"
     microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/ceph-$PACKAGE_NAME.yaml
