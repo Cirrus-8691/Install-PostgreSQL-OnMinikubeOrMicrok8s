@@ -115,15 +115,20 @@ sudo microk8s helm repo add bitnami https://charts.bitnami.com/bitnami
 - After openning a SSH session to one of the server of the Mick8s cluster,
 - git clonet his project,
 - create a folder named using the current server ip, like "192.168.0.45",
-- customise install according to projet ( capacity storage, ...)
+- customise install according to projet:
+    - database
+    - username, password
+    - persistence.size
 - install Postgresql with:
   
 ```bash
 cd networking/postgresql-microk8s
-# using NFS storage class
-sudo ./install-nfs.sh [projectName]
+# using NFS storage class (not recommanded)
+sudo ./install.sh nfs [projectName]
+
 # using Ceph-rbd storage class
-sudo ./install-ceph.sh [projectName]
+sudo ./install.sh ceph [projectName]
+
 ```
 Uninstall
 ```bash

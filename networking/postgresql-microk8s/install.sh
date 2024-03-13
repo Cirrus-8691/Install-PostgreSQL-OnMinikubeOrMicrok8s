@@ -4,13 +4,15 @@ normal=$(tput sgr0)
 underline=$(tput smul)
 red=$(tput setaf 1)
 white=$(tput setaf 7)
-if ! [ $# -eq 1 ]; then
+if ! [ $# -eq 2 ]; then
   echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}PROJECT_NAME${normal}"
+  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}STORAGE_CLASS, PROJECT_NAME${normal}"
   echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
   exit 1
 fi
-PROJECT_NAME=$1
+STORAGE_CLASS=$1
+PROJECT_NAME=$2
+
 INFOS=$(ip a | grep 'inet ' | grep /24)
 IFS=' /' read -r -a INFO_ITEMS <<< "$INFOS"
 MICROK8S_SERVER_IP=${INFO_ITEMS[1]}
@@ -19,7 +21,7 @@ APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
 NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
 
-# Warning: no PV with storageClass: "nfs-csi" 
+# Warning: no PV with STORAGE_CLASS: "ceph-rbd" 
 
 echo ""
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -53,7 +55,7 @@ else
     fi
 
     echo "✨  Install $APP_INSTALLED"
-    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/nfs-$PACKAGE_NAME.yaml
+    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/$STORAGE_CLASS-microk8s.yaml
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}$PACKAGE_NAME${normal} "
@@ -68,20 +70,6 @@ else
         echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
         exit 1
     fi
-
-    INFOS=$(microk8s kubectl get pvc -n $NAMESPACE | grep nfs-csi)
-    IFS=' ' read -r -a INFO_ITEMS <<< "$INFOS"
-    VOLUME=${INFO_ITEMS[2]}
-    PV=$(microk8s kubectl get pv $VOLUME)
-    volumeHandle=$(microk8s kubectl get pv $VOLUME -o jsonpath="{.spec.csi.volumeHandle}")
-
-    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "┃  Check NFS path: $volumeHandle/data"
-    echo "┃  Expecting: ls -la => drwxrwxrwx "
-    echo "┃  If not:"
-    echo "┃  cd $volumeHandle"
-    echo "┃  chmod -R a+rwx data/"
-    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 fi
 
