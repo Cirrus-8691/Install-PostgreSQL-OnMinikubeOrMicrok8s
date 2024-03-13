@@ -69,12 +69,6 @@ else
         exit 1
     fi
 
-    # ----------------------------------------------
-    # CHECK /srv/nfs path expecting:
-    #   chown -R 1001:1001 $PV_PATH
-    # Et surout:
-    #   chmod -R a+rwx $PV_PATH
-    # ----------------------------------------------
     INFOS=$(microk8s kubectl get pvc -n $NAMESPACE | grep nfs-csi)
     IFS=' ' read -r -a INFO_ITEMS <<< "$INFOS"
     VOLUME=${INFO_ITEMS[2]}
@@ -82,11 +76,11 @@ else
     volumeHandle=$(microk8s kubectl get pv $VOLUME -o jsonpath="{.spec.csi.volumeHandle}")
 
     echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "┃  Check NFS path: "$volumeHandle
-    echo "┃  Expecting: ls -la => drwxrwxrwx 3 1001 1001"
+    echo "┃  Check NFS path: $volumeHandle/data"
+    echo "┃  Expecting: ls -la => drwxrwxrwx "
     echo "┃  If not:"
-    echo "┃  chown -R 1001:1001 [PATH]"
-    echo "┃  chmod -R a+rwx [PATH]"
+    echo "┃  cd $volumeHandle"
+    echo "┃  chmod -R a+rwx data/"
     echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 fi
