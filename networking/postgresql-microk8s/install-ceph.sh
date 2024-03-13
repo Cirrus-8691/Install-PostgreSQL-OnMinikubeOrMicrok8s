@@ -52,14 +52,15 @@ else
         exit 1
     fi
 
-    echo "✨  Install PersistentVolume"
-    kubectl apply -f ../values/$EXTERNAL_IP/pv-$PACKAGE_NAME.yaml
-    if ! [ $? -eq 0 ]; then
-        echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
-        echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
-        exit 1
-    fi
+    # echo "✨  Install PersistentVolume"
+    # microk8s kubectl apply -f ../values/$MICROK8S_SERVER_IP/ceph-pv-$PACKAGE_NAME.yaml
+    # if ! [ $? -eq 0 ]; then
+    #     echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    #     echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
+    #     echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
+    #     exit 1
+    # fi
+
     # echo "✨  Creating "$STORAGE_FOLDER
     # mkdir $STORAGE_FOLDER
     # echo "✨  Creating "$PV_PATH
