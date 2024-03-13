@@ -120,7 +120,10 @@ sudo microk8s helm repo add bitnami https://charts.bitnami.com/bitnami
   
 ```bash
 cd networking/postgresql-microk8s
+# using NFS storage class
 sudo ./install-nfs.sh [projectName]
+# using Ceph-rbd storage class
+sudo ./install-ceph.sh [projectName]
 ```
 Uninstall
 ```bash

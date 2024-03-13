@@ -52,8 +52,23 @@ else
         exit 1
     fi
 
+    echo "✨  Install PersistentVolume"
+    kubectl apply -f ../values/$EXTERNAL_IP/pv-$PACKAGE_NAME.yaml
+    if ! [ $? -eq 0 ]; then
+        echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
+        echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
+        exit 1
+    fi
+    # echo "✨  Creating "$STORAGE_FOLDER
+    # mkdir $STORAGE_FOLDER
+    # echo "✨  Creating "$PV_PATH
+    # mkdir $PV_PATH
+    # chown -R 1001:1001 $PV_PATH
+    # chmod -R a+rwx $PV_PATH
+
     echo "✨  Install $APP_INSTALLED"
-    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/$PACKAGE_NAME.yaml
+    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/ceph-$PACKAGE_NAME.yaml
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}$PACKAGE_NAME${normal} "
@@ -68,26 +83,6 @@ else
         echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
         exit 1
     fi
-
-    # ----------------------------------------------
-    # CHECK /srv/nfs path expecting:
-    #   chown -R 1001:1001 $PV_PATH
-    # Et surout:
-    #   chmod -R a+rwx $PV_PATH
-    # ----------------------------------------------
-    INFOS=$(microk8s kubectl get pvc -n $NAMESPACE | grep nfs-csi)
-    IFS=' ' read -r -a INFO_ITEMS <<< "$INFOS"
-    VOLUME=${INFO_ITEMS[2]}
-    PV=$(microk8s kubectl get pv $VOLUME)
-    volumeHandle=$(microk8s kubectl get pv $VOLUME -o jsonpath="{.spec.csi.volumeHandle}")
-
-    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "┃  Check NFS path: "$volumeHandle
-    echo "┃  Expecting: ls -la => drwxrwxrwx 3 1001 1001"
-    echo "┃  If not:"
-    echo "┃  chown -R 1001:1001 [PATH]"
-    echo "┃  chmod -R a+rwx [PATH]"
-    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 fi
 
