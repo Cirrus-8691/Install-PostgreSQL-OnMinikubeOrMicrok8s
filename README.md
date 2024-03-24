@@ -59,19 +59,20 @@ In a single MicroK8s node.
 
 https://github.com/bitnami/charts/tree/main/bitnami/postgresql
 
-With the default binami installation, when **Minikube** restart ( i.e. when laptop or server restart), the **StatefulSet** postgresql failed to start with a message "Back-off restarting failed container", because its **Container** cannot read/write with the default **StorageClass** in the previously used **PersistentVolume**.
 
 ## Minikube
 
+With the default binami installation, when **Minikube** restart ( i.e. when laptop or server restart), the **StatefulSet** postgresql failed to start with a message "Back-off restarting failed container", because its **Container** cannot read/write with the default **StorageClass** in the previously used **PersistentVolume**.
+
 # Customised install
 
-We use a **StorageClass** with **reclaimPolicy: Retain**, to keep data when the server/laptop where Minikube is running, restart.
-As Bitnami chart container run as user 1001 in goup 1001 we have to change default file acces mode of the **PersistentVolume** hostPath.
+We use a **StorageClass** using **kubernetes.io/no-provisioner** with **reclaimPolicy: Retain**, to keep data when the server/laptop where Minikube is running, restart.
+As Bitnami chart container run as user 1001 in goup 1001 we have to change default file access mode of the **PersistentVolume** hostPath.
 
 # Customise install according to projet and Minikube server ip.
 Create your own folder, in networking/values, named with the server ip, like 192.168.0.24. 
 
-Copy there the two files and update values for your needs:
+Copy there this two files and update values for your needs:
 - postgresql.yaml where you can modify database name, user and password, persistence size.
 - pv-postgresql.yaml where you can describe persistant volume specification like hostPath and capacity storage ( same as persistence size below).
 
@@ -113,7 +114,7 @@ sudo microk8s helm repo add bitnami https://charts.bitnami.com/bitnami
 ```
 
 - After openning a SSH session to one of the server of the Mick8s cluster,
-- git clonet his project,
+- git clonet this project,
 - create a folder named using the current server ip, like "192.168.0.45",
 - customise install according to projet:
     - database
