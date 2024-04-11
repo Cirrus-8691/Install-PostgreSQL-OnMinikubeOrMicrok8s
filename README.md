@@ -131,6 +131,7 @@ sudo ./install.sh nfs [projectName]
 sudo ./install.sh ceph [projectName]
 
 # using "microk8s.io/hostpath"
+sudo ./install.sh pv0 easiware-dev
 sudo ./install.sh pv1 easiware-test
 
 ```

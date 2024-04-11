@@ -65,7 +65,7 @@ else
 
     if ! [ "$STORAGE_CLASS" == "nfs" ] && ! [ "$STORAGE_CLASS" == "ceph" ]; then
         # Check "pv-prestgresql.yaml"
-        STORAGE_FOLDER="/storage"
+        STORAGE_FOLDER="/srv/storage"
         PV_NAME=$PACKAGE_NAME"-"$STORAGE_CLASS
         PV_PATH=$STORAGE_FOLDER"/data-"$PV_NAME
         echo "✨  Install PersistentVolume"
