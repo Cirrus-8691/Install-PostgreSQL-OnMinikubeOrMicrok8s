@@ -10,6 +10,15 @@ if ! [ $# -eq 2 ]; then
   echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
   exit 1
 fi
+if ! [ $USER == "root" ]; then
+  echo "$red┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "┃$white 🔥 FATAL ERROR: USER is not root, it's $red$USER"
+  echo "$red┠────────────────────────────────────────────$blue"
+  echo "$red┃${white}run ${blue}sudo $0 $1 $2"
+  echo "$red┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$white"
+  exit 1
+fi
+
 PACKAGE_NAME="postgresql"
 NAMESPACE=$1
 EXTERNAL_IP=$2

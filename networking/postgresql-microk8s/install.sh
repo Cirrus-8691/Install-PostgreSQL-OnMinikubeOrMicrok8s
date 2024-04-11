@@ -10,16 +10,25 @@ if ! [ $# -eq 2 ]; then
   echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
   exit 1
 fi
+if ! [ $USER == "root" ]; then
+  echo "$red┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "┃$white 🔥 FATAL ERROR: USER is not root, it's $red$USER"
+  echo "$red┠────────────────────────────────────────────$blue"
+  echo "$red┃${white}run ${blue}sudo $0 $1 $2"
+  echo "$red┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$white"
+  exit 1
+fi
+
 STORAGE_CLASS=$1
 PROJECT_NAME=$2
 
-INFOS=$(ip a | grep 'inet ' | grep /24)
+INFOS=$(ip a | grep 'inet ' | grep /21)
 IFS=' /' read -r -a INFO_ITEMS <<< "$INFOS"
 MICROK8S_SERVER_IP=${INFO_ITEMS[1]}
 
 APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
-NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
+NAMESPACE="$PACKAGE_NAME-$PROJECT_NAME"
 
 # Warning: no PV with STORAGE_CLASS: "ceph-rbd" 
 
@@ -54,8 +63,29 @@ else
         exit 1
     fi
 
+    if ! [ "$STORAGE_CLASS" == "nfs" ] && ! [ "$STORAGE_CLASS" == "ceph" ]; then
+        # Check "pv-prestgresql.yaml"
+        STORAGE_FOLDER="/storage"
+        PV_NAME=$PACKAGE_NAME"-"$STORAGE_CLASS
+        PV_PATH=$STORAGE_FOLDER"/data-"$PV_NAME
+        echo "✨  Install PersistentVolume"
+        microk8s kubectl apply -f ../values/$MICROK8S_SERVER_IP/$STORAGE_CLASS-$PACKAGE_NAME.yaml
+        if ! [ $? -eq 0 ]; then
+            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
+            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
+            exit 1
+        fi
+        echo "✨  Creating "$STORAGE_FOLDER
+        mkdir $STORAGE_FOLDER
+        echo "✨  Creating "$PV_PATH
+        mkdir $PV_PATH
+        chown -R 1001:1001 $PV_PATH
+        chmod -R a+rwx $PV_PATH
+    fi
+    
     echo "✨  Install $APP_INSTALLED"
-    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/$STORAGE_CLASS-microk8s.yaml
+    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/$PACKAGE_NAME.yaml
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}$PACKAGE_NAME${normal} "

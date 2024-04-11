@@ -1,0 +1,20 @@
+############################################
+## Minikube
+############################################
+##  capacity storage: 500Mi
+##  /storage/data-postgresql-pv-1 must be created before
+##
+############################################
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgresql-pv-1
+spec:
+  # Check install.sh for the "name"
+  storageClassName: postgresql-storage
+  capacity:
+    storage: 500Mi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/srv/storage/data-postgresql-pv-1"

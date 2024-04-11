@@ -130,6 +130,9 @@ sudo ./install.sh nfs [projectName]
 # using Ceph-rbd storage class
 sudo ./install.sh ceph [projectName]
 
+# using "microk8s.io/hostpath"
+sudo ./install.sh pv1 easiware-test
+
 ```
 Uninstall
 ```bash
