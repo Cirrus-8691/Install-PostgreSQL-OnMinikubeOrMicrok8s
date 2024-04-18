@@ -4,9 +4,9 @@ normal=$(tput sgr0)
 underline=$(tput smul)
 red=$(tput setaf 1)
 white=$(tput setaf 7)
-if ! [ $# -eq 2 ]; then
+if ! [ $# -eq 3 ]; then
   echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}STORAGE_CLASS, PROJECT_NAME${normal}"
+  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}STORAGE_CLASS, PROJECT_NAME, EXTERNAL_IP${normal}"
   echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
   exit 1
 fi
@@ -21,6 +21,7 @@ fi
 
 STORAGE_CLASS=$1
 PROJECT_NAME=$2
+EXTERNAL_IP=$3
 
 INFOS=$(ip a | grep 'inet ' | grep /21)
 IFS=' /' read -r -a INFO_ITEMS <<< "$INFOS"
@@ -93,7 +94,7 @@ else
         exit 1
     fi
 
-    ./patch-externalIP.sh $NAMESPACE $MICROK8S_SERVER_IP
+    ./patch-externalIP.sh $NAMESPACE $EXTERNAL_IP
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}patch-externalIP${normal} "

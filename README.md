@@ -131,8 +131,9 @@ sudo ./install.sh nfs [projectName]
 sudo ./install.sh ceph [projectName]
 
 # using "microk8s.io/hostpath"
-sudo ./install.sh pv0 easiware-dev
-sudo ./install.sh pv1 easiware-test
+cd networking/postgresql-microk8s
+sudo ./install.sh pv0 easiware-dev 10.0.0.7
+sudo ./install.sh pv1 easiware-test 10.0.0.7
 
 ```
 Uninstall

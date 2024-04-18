@@ -15,7 +15,7 @@ auth:
   ##
   ## @param auth.database Name for a custom database to create
   ##
-  database: "easiware-start-api-test"
+  database: "easiware-start-api"
 
 primary:
   service:
