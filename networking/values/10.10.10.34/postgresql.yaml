@@ -1,0 +1,40 @@
+############################################
+## Minikube
+############################################
+global:
+  storageClass: "postgresql-storage"
+auth:
+  ##
+  ## @param auth.username Name for a custom user to create
+  ##
+  username : "postgres"
+  ##
+  ## @param auth.password Password for the custom user to create
+  ##
+  password : "postgres"
+  ##
+  ## @param auth.database Name for a custom database to create
+  ##
+  database: "easiware-start-api"
+
+primary:
+  service:
+    ##
+    ## @param service.type service type
+    ##
+    type: LoadBalancer
+    # ports: 
+    #  postgresql: 5432
+
+    ## @param master.service.externalIPs Redis&reg; master service External IPs
+    ## https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
+    ##
+    # WARNING: This is not implemented 
+    # externalIPs : 
+    # - 192.168.0.30
+
+  persistence:
+    ##
+    ## @param primary.persistence.size PVC Storage Request for PostgreSql data volume
+    ##
+    size: 900Mi

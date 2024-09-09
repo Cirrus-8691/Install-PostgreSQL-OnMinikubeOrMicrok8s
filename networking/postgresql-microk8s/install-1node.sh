@@ -4,9 +4,9 @@ normal=$(tput sgr0)
 underline=$(tput smul)
 red=$(tput setaf 1)
 white=$(tput setaf 7)
-if ! [ $# -eq 2 ]; then
+if ! [ $# -eq 3 ]; then
   echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}PROJECT_NAME, EXTERNAL_IP${normal}"
+  echo "┃${white} 🔥FATAL ERROR: No arguments supplied for ${bold}${underline}STORAGE_CLASS, PROJECT_NAME, EXTERNAL_IP${normal}"
   echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
   exit 1
 fi
@@ -19,17 +19,18 @@ if ! [ $USER == "root" ]; then
   exit 1
 fi
 
-PROJECT_NAME=$1
-EXTERNAL_IP=$2
+STORAGE_CLASS=$1
+PROJECT_NAME=$2
+EXTERNAL_IP=$3
+
+INFOS=$(ip a | grep 'inet ' | grep /24)
+IFS=' /' read -r -a INFO_ITEMS <<< "$INFOS"
+MICROK8S_SERVER_IP=${INFO_ITEMS[1]}
 
 APP_INSTALLED="PostgreSql"
 PACKAGE_NAME="postgresql"
-NAMESPACE="$PROJECT_NAME-$PACKAGE_NAME"
+NAMESPACE="$PACKAGE_NAME-$PROJECT_NAME"
 
-# Check "pv-prestgresql.yaml"
-STORAGE_FOLDER="/storage"
-PV_NAME=$PACKAGE_NAME"-pv-0"
-PV_PATH=$STORAGE_FOLDER"/data-"$PV_NAME
 echo ""
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "┃ 🔵  Install $APP_INSTALLED for project $PROJECT_NAME"
@@ -38,12 +39,9 @@ echo "┃ 🔷  Parameters"
 echo "┃────────────────────────────────────────────"
 echo "┃ 🔹 package    = "$PACKAGE_NAME
 echo "┃ 🔹 namespace  = "$NAMESPACE
-echo "┃ 🔹 externalIp = "$EXTERNAL_IP
-echo "┃────────────────────────────────────────────"
-echo "┃ 🔹 PersistentVolume name = "$PV_NAME
-echo "┃ 🔹 PersistentVolume path = "$PV_PATH
+echo "┃ 🔹 externalIp = "$MICROK8S_SERVER_IP
 
-NAMESPACE_FOUND=$(kubectl get namespace | grep $NAMESPACE)
+NAMESPACE_FOUND=$(microk8s kubectl get namespace | grep $NAMESPACE)
 if [[ "$NAMESPACE_FOUND" == *"$NAMESPACE"* ]]; then
 
     echo "┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -55,47 +53,8 @@ if [[ "$NAMESPACE_FOUND" == *"$NAMESPACE"* ]]; then
 else
     echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-    echo "🛂  Check PersistentVolume $PV_NAME"
-    kubectl get pv $PV_NAME
-    if ! [ $? -eq 0 ]; then
-
-        echo "✨  Install StorageClass"
-        kubectl apply -f ../postgresql-minikube/hostpath-storageclass.yaml
-        if ! [ $? -eq 0 ]; then
-            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}StorageClass${normal}"
-            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
-            exit 1
-        fi
-
-        echo "✨  Install PersistentVolume"
-        kubectl apply -f ../values/$EXTERNAL_IP/pv-$PACKAGE_NAME.yaml
-        if ! [ $? -eq 0 ]; then
-            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
-            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
-            exit 1
-        fi
-        echo "✨  Creating "$STORAGE_FOLDER
-        mkdir $STORAGE_FOLDER
-        echo "✨  Creating "$PV_PATH
-        mkdir $PV_PATH
-        chown -R 1001:1001 $PV_PATH
-        chmod -R a+rwx $PV_PATH
-
-    else
-        echo "♻️  Recycle existing PersistentVolume"
-        kubectl patch pv $PV_NAME -p '{"spec":{"claimRef": null}}'
-        if ! [ $? -eq 0 ]; then
-            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "┃${white} 🔥FATAL ERROR: Recycle $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
-            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
-            exit 1
-        fi
-    fi
-
     echo "✨  Create Namespace "$NAMESPACE
-    kubectl create ns $NAMESPACE
+    microk8s kubectl create ns $NAMESPACE
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}Namespace${normal} "
@@ -103,8 +62,36 @@ else
         exit 1
     fi
 
+        echo "✨  Install StorageClass"
+        microk8s kubectl apply -f ../postgresql-microk8s/hostpath-storageclass.yaml
+        if ! [ $? -eq 0 ]; then
+            echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}StorageClass${normal}"
+            echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
+            exit 1
+        fi
+
+    # Check "pv-prestgresql.yaml"
+    STORAGE_FOLDER="/srv/storage"
+    PV_NAME=$PACKAGE_NAME"-"$STORAGE_CLASS
+    PV_PATH=$STORAGE_FOLDER"/data-"$PV_NAME
+    echo "✨  Install PersistentVolume"
+    microk8s kubectl apply -f ../values/$MICROK8S_SERVER_IP/$STORAGE_CLASS-$PACKAGE_NAME.yaml
+    if ! [ $? -eq 0 ]; then
+        echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}PersistentVolume${normal} "
+        echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
+        exit 1
+    fi
+    echo "✨  Creating "$STORAGE_FOLDER
+    mkdir $STORAGE_FOLDER
+    echo "✨  Creating "$PV_PATH
+    mkdir $PV_PATH
+    chown -R 1001:1001 $PV_PATH
+    chmod -R a+rwx $PV_PATH
+
     echo "✨  Install $APP_INSTALLED"
-    helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$EXTERNAL_IP/$PACKAGE_NAME.yaml
+    microk8s helm -n $NAMESPACE install $PACKAGE_NAME bitnami/$PACKAGE_NAME -f ../values/$MICROK8S_SERVER_IP/$PACKAGE_NAME.yaml
     if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}$PACKAGE_NAME${normal} "
@@ -113,12 +100,13 @@ else
     fi
 
     ./patch-externalIP.sh $NAMESPACE $EXTERNAL_IP
-        if ! [ $? -eq 0 ]; then
+    if ! [ $? -eq 0 ]; then
         echo "${red}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
         echo "┃${white} 🔥FATAL ERROR: Installing $APP_INSTALLED ${bold}${underline}patch-externalIP${normal} "
         echo "${red}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${white}"
         exit 1
     fi
+
 fi
 
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
