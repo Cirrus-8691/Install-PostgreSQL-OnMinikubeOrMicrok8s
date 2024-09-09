@@ -37,4 +37,4 @@ primary:
     ##
     ## @param primary.persistence.size PVC Storage Request for PostgreSql data volume
     ##
-    size: 900Mi
+    size: 5Gi
